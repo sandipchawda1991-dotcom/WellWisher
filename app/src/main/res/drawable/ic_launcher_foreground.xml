@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Confetti streamers -->
+    <path android:fillColor="#FFD700"
+        android:pathData="M40,25 Q45,15 50,25 Q55,35 60,25 Q65,15 70,25"/>
+    <path android:fillColor="#FF6B9D"
+        android:pathData="M35,30 Q30,20 35,15 Q40,10 38,20"/>
+    <path android:fillColor="#4ECDC4"
+        android:pathData="M73,30 Q78,20 73,15 Q68,10 70,20"/>
+
+    <!-- Stars -->
+    <path android:fillColor="#FFD700"
+        android:pathData="M54,20 L55.5,24 L60,24 L56.5,26.5 L58,31 L54,28 L50,31 L51.5,26.5 L48,24 L52.5,24 Z"/>
+
+    <!-- Main party popper body -->
+    <path android:fillColor="#FF8C42"
+        android:pathData="M30,75 L55,45 L68,58 Z"/>
+
+    <!-- Party popper cone -->
+    <path android:fillColor="#FFB347"
+        android:pathData="M55,45 L68,58 L72,52 L62,38 Z"/>
+
+    <!-- Confetti dots -->
+    <circle android:fillColor="#FF6B9D" android:cx="72" android:cy="35" android:r="3"/>
+    <circle android:fillColor="#6B4EFF" android:cx="65" android:cy="28" android:r="2.5"/>
+    <circle android:fillColor="#4ECDC4" android:cx="80" android:cy="42" android:r="2"/>
+    <circle android:fillColor="#FFD700" android:cx="78" android:cy="30" android:r="3"/>
+    <circle android:fillColor="#FF8C42" android:cx="58" android:cy="25" android:r="2"/>
+    <circle android:fillColor="#FF6B9D" android:cx="85" android:cy="35" android:r="2.5"/>
+    <circle android:fillColor="#6B4EFF" android:cx="75" android:cy="48" android:r="2"/>
+
+    <!-- Confetti rectangles -->
+    <rect android:fillColor="#4ECDC4" android:x="68" android:y="22"
+        android:width="5" android:height="3" android:rx="1"/>
+    <rect android:fillColor="#FF6B9D" android:x="82" android:y="28"
+        android:width="4" android:height="3" android:rx="1"/>
+    <rect android:fillColor="#FFD700" android:x="60" android:y="32"
+        android:width="4" android:height="3" android:rx="1"/>
+
+    <!-- Sparkle lines -->
+    <path android:strokeColor="#FFD700" android:strokeWidth="2"
+        android:pathData="M83,20 L83,26 M80,23 L86,23"/>
+    <path android:strokeColor="#FF6B9D" android:strokeWidth="2"
+        android:pathData="M90,38 L90,44 M87,41 L93,41"/>
+</vector>
