@@ -56,399 +56,195 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Who is this for?"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
+            <!-- Who -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Who is this for?" android:textSize="14sp" android:textStyle="bold"
+                android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👤"
-                        android:textSize="20sp"
-                        android:layout_marginEnd="12dp"/>
-                    <EditText
-                        android:id="@+id/etName"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="e.g. Rahul, Mom, Wifey"
-                        android:background="@null"
-                        android:textSize="15sp"
-                        android:textColor="#1A1A2E"
+                android:layout_width="match_parent" android:layout_height="56dp"
+                android:layout_marginBottom="16dp" app:cardCornerRadius="14dp"
+                app:cardElevation="2dp" app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:paddingLeft="16dp" android:paddingRight="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="👤" android:textSize="20sp" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etName" android:layout_width="match_parent"
+                        android:layout_height="match_parent" android:hint="e.g. Rahul, Mom, Wifey"
+                        android:background="@null" android:textSize="15sp" android:textColor="#1A1A2E"
                         android:textColorHint="#AAAACC"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone number (for WhatsApp)"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
+            <!-- Phone with contact picker -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Phone number (for WhatsApp)" android:textSize="14sp"
+                android:textStyle="bold" android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📞"
-                        android:textSize="20sp"
-                        android:layout_marginEnd="12dp"/>
-                    <EditText
-                        android:id="@+id/etPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="+91 98765 43210"
-                        android:background="@null"
-                        android:inputType="phone"
-                        android:textSize="15sp"
-                        android:textColor="#1A1A2E"
-                        android:textColorHint="#AAAACC"/>
+                android:layout_width="match_parent" android:layout_height="56dp"
+                android:layout_marginBottom="4dp" app:cardCornerRadius="14dp"
+                app:cardElevation="2dp" app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:paddingLeft="16dp" android:paddingRight="8dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📞" android:textSize="20sp" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etPhone" android:layout_width="0dp"
+                        android:layout_height="match_parent" android:layout_weight="1"
+                        android:hint="+91 98765 43210" android:background="@null"
+                        android:inputType="phone" android:textSize="15sp"
+                        android:textColor="#1A1A2E" android:textColorHint="#AAAACC"/>
+                    <LinearLayout android:id="@+id/btnPickContact"
+                        android:layout_width="40dp" android:layout_height="40dp"
+                        android:gravity="center" android:background="#EDE9FF"
+                        android:clickable="true" android:focusable="true"
+                        android:layout_marginStart="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="👥" android:textSize="18sp"/>
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Occasion type"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-                <LinearLayout
-                    android:id="@+id/btnOccBirthday"
-                    android:layout_width="0dp"
-                    android:layout_height="72dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#6B4EFF"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🎂"
-                        android:textSize="28sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Birthday"
-                        android:textSize="13sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btnOccAnniversary"
-                    android:layout_width="0dp"
-                    android:layout_height="72dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="#FFFFFF"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="💑"
-                        android:textSize="28sp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Anniversary"
-                        android:textSize="13sp"
-                        android:textColor="#6B4EFF"
-                        android:textStyle="bold"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/etCat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="birthday"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="When is it?"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
-            <androidx.cardview.widget.CardView
-                android:id="@+id/datePickerRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📅"
-                        android:textSize="20sp"
-                        android:layout_marginEnd="12dp"/>
-                    <TextView
-                        android:id="@+id/tvDateDisplay"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Tap to select date"
-                        android:textSize="15sp"
-                        android:textColor="#AAAACC"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textSize="22sp"
-                        android:textColor="#6B4EFF"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <EditText
-                android:id="@+id/etDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Repeats every year automatically"
-                android:textSize="12sp"
-                android:textColor="#059669"
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Tap 👥 to pick from contacts or type manually"
+                android:textSize="11sp" android:textColor="#6B4EFF"
                 android:layout_marginBottom="16dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Emoji level in message"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-                <LinearLayout
-                    android:id="@+id/btnEmojiNone"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="#FFFFFF"
-                    android:layout_marginEnd="6dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="None"
-                        android:textSize="13sp"
-                        android:textColor="#6B4EFF"
-                        android:textStyle="bold"/>
+            <!-- Occasion type -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Occasion type" android:textSize="14sp" android:textStyle="bold"
+                android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="16dp">
+                <LinearLayout android:id="@+id/btnOccBirthday" android:layout_width="0dp"
+                    android:layout_height="72dp" android:layout_weight="1"
+                    android:orientation="vertical" android:gravity="center"
+                    android:background="#6B4EFF" android:layout_marginEnd="8dp"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🎂" android:textSize="28sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Birthday" android:textSize="13sp" android:textColor="#FFFFFF"
+                        android:textStyle="bold" android:layout_marginTop="4dp"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btnEmojiFew"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="#6B4EFF"
-                    android:layout_marginEnd="6dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Few"
-                        android:textSize="13sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/btnEmojiLots"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="#FFFFFF"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Lots"
-                        android:textSize="13sp"
-                        android:textColor="#6B4EFF"
-                        android:textStyle="bold"/>
+                <LinearLayout android:id="@+id/btnOccAnniversary" android:layout_width="0dp"
+                    android:layout_height="72dp" android:layout_weight="1"
+                    android:orientation="vertical" android:gravity="center"
+                    android:background="#FFFFFF" android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="💑" android:textSize="28sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Anniversary" android:textSize="13sp" android:textColor="#6B4EFF"
+                        android:textStyle="bold" android:layout_marginTop="4dp"/>
                 </LinearLayout>
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/etEmoji"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="few"/>
+            <EditText android:id="@+id/etCat" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone" android:text="birthday"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remind me at"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#6B4EFF"
-                android:layout_marginBottom="8dp"/>
-            <androidx.cardview.widget.CardView
-                android:id="@+id/timePickerRow"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bell"
-                        android:textSize="20sp"
-                        android:layout_marginEnd="12dp"/>
-                    <TextView
-                        android:id="@+id/tvTimeDisplay"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="9:00 AM"
-                        android:textSize="15sp"
-                        android:textColor="#1A1A2E"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textSize="22sp"
-                        android:textColor="#6B4EFF"/>
+            <!-- Date -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="When is it?" android:textSize="14sp" android:textStyle="bold"
+                android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
+            <androidx.cardview.widget.CardView android:id="@+id/datePickerRow"
+                android:layout_width="match_parent" android:layout_height="56dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true"
+                app:cardCornerRadius="14dp" app:cardElevation="2dp" app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:paddingLeft="16dp" android:paddingRight="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📅" android:textSize="20sp" android:layout_marginEnd="12dp"/>
+                    <TextView android:id="@+id/tvDateDisplay" android:layout_width="0dp"
+                        android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="Tap to select date" android:textSize="15sp"
+                        android:textColor="#AAAACC"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text=">" android:textSize="22sp" android:textColor="#6B4EFF"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+            <EditText android:id="@+id/etDate" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Repeats every year automatically"
+                android:textSize="12sp" android:textColor="#059669" android:layout_marginBottom="16dp"/>
 
-            <EditText
-                android:id="@+id/etHour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="9"/>
+            <!-- Emoji -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Emoji level in message" android:textSize="14sp" android:textStyle="bold"
+                android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginBottom="16dp">
+                <LinearLayout android:id="@+id/btnEmojiNone" android:layout_width="0dp"
+                    android:layout_height="48dp" android:layout_weight="1" android:gravity="center"
+                    android:background="#FFFFFF" android:layout_marginEnd="6dp"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="None" android:textSize="13sp" android:textColor="#6B4EFF"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <LinearLayout android:id="@+id/btnEmojiFew" android:layout_width="0dp"
+                    android:layout_height="48dp" android:layout_weight="1" android:gravity="center"
+                    android:background="#6B4EFF" android:layout_marginEnd="6dp"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Few" android:textSize="13sp" android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <LinearLayout android:id="@+id/btnEmojiLots" android:layout_width="0dp"
+                    android:layout_height="48dp" android:layout_weight="1" android:gravity="center"
+                    android:background="#FFFFFF" android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Lots" android:textSize="13sp" android:textColor="#6B4EFF"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+            <EditText android:id="@+id/etEmoji" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone" android:text="few"/>
 
-            <EditText
-                android:id="@+id/etMin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="0"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <!-- Time -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Remind me at" android:textSize="14sp" android:textStyle="bold"
+                android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
+            <androidx.cardview.widget.CardView android:id="@+id/timePickerRow"
+                android:layout_width="match_parent" android:layout_height="56dp"
+                android:layout_marginBottom="4dp" android:clickable="true" android:focusable="true"
+                app:cardCornerRadius="14dp" app:cardElevation="2dp" app:cardBackgroundColor="#FFFFFF">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:paddingLeft="16dp" android:paddingRight="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🔔" android:textSize="20sp" android:layout_marginEnd="12dp"/>
+                    <TextView android:id="@+id/tvTimeDisplay" android:layout_width="0dp"
+                        android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="9:00 AM" android:textSize="15sp" android:textColor="#1A1A2E"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text=">" android:textSize="22sp" android:textColor="#6B4EFF"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <EditText android:id="@+id/etHour" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone" android:text="9"/>
+            <EditText android:id="@+id/etMin" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone" android:text="0"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="You will get a notification every year at this time"
-                android:textSize="12sp"
-                android:textColor="#059669"
-                android:layout_marginBottom="24dp"/>
+                android:textSize="12sp" android:textColor="#059669" android:layout_marginBottom="24dp"/>
 
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:padding="16dp"
-        android:elevation="8dp">
-
-        <Button
-            android:id="@+id/btnSaveDone"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:text="Save. I am Done"
-            android:backgroundTint="#6B4EFF"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="10dp"
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:background="#FFFFFF"
+        android:padding="16dp" android:elevation="8dp">
+        <Button android:id="@+id/btnSaveDone" android:layout_width="match_parent"
+            android:layout_height="54dp" android:text="Save. I am Done"
+            android:backgroundTint="#6B4EFF" android:textColor="#FFFFFF"
+            android:textSize="16sp" android:textStyle="bold" android:layout_marginBottom="10dp"
             style="@style/Widget.MaterialComponents.Button"/>
-
-        <Button
-            android:id="@+id/btnSaveAddAnother"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:text="Save and Add Another"
-            android:backgroundTint="#EDE9FF"
-            android:textColor="#6B4EFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
+        <Button android:id="@+id/btnSaveAddAnother" android:layout_width="match_parent"
+            android:layout_height="54dp" android:text="Save and Add Another"
+            android:backgroundTint="#EDE9FF" android:textColor="#6B4EFF"
+            android:textSize="16sp" android:textStyle="bold"
             style="@style/Widget.MaterialComponents.Button"/>
-
     </LinearLayout>
 
 </LinearLayout>
