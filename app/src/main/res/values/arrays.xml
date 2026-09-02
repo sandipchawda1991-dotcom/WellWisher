@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories">
+        <item>Birthday</item>
+        <item>Anniversary</item>
+        <item>Work Anniversary</item>
+        <item>Graduation</item>
+        <item>Baby Birthday</item>
+        <item>Friendship Day</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="relationships">
+        <item>Friend</item>
+        <item>Family</item>
+        <item>Colleague</item>
+        <item>Boss</item>
+        <item>Partner</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="lengths">
+        <item>Very Short</item>
+        <item>Short</item>
+        <item>Long</item>
+        <item>Very Long</item>
+    </string-array>
+    <string-array name="emojis">
+        <item>No Emoji</item>
+        <item>Few Emoji</item>
+        <item>More Emoji</item>
+    </string-array>
+</resources>
