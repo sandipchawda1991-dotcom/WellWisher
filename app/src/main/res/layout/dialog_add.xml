@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Full name" android:textSize="12sp" android:textColor="#6b7280"/>
+        <EditText android:id="@+id/etName" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="e.g. Rahul Sharma"
+            android:layout_marginBottom="10dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Phone with country code" android:textSize="12sp" android:textColor="#6b7280"/>
+        <EditText android:id="@+id/etPhone" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="+91 98765 43210"
+            android:inputType="phone" android:layout_marginBottom="10dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Date (YYYY-MM-DD)" android:textSize="12sp" android:textColor="#6b7280"/>
+        <EditText android:id="@+id/etDate" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="1990-03-15"
+            android:layout_marginBottom="10dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Occasion" android:textSize="12sp" android:textColor="#6b7280"/>
+        <Spinner android:id="@+id/spinnerCat" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="10dp"
+            android:entries="@array/categories"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Relationship" android:textSize="12sp" android:textColor="#6b7280"/>
+        <Spinner android:id="@+id/spinnerRel" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="10dp"
+            android:entries="@array/relationships"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Message length" android:textSize="12sp" android:textColor="#6b7280"/>
+        <Spinner android:id="@+id/spinnerLen" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="10dp"
+            android:entries="@array/lengths"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Emoji style" android:textSize="12sp" android:textColor="#6b7280"/>
+        <Spinner android:id="@+id/spinnerEmoji" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="10dp"
+            android:entries="@array/emojis"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Reminder time" android:textSize="12sp" android:textColor="#6b7280"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center" android:layout_marginBottom="10dp">
+            <NumberPicker android:id="@+id/hourPicker"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="  :  " android:textSize="20sp"/>
+            <NumberPicker android:id="@+id/minPicker"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
