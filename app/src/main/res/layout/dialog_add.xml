@@ -3,339 +3,133 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#F2F0FF">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Who is this for -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Who is this for?"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A2E"
-            android:layout_marginBottom="8dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Who is this for?" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#1A1A2E" android:layout_marginBottom="8dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+            android:orientation="horizontal" android:background="#FFFFFF"
+            android:gravity="center_vertical" android:paddingHorizontal="16dp"
             android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="👤  "
-                android:textSize="16sp"/>
-
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="e.g. Jack, Mom &amp; Dad, Wifey"
-                android:background="@null"
-                android:textSize="15sp"
-                android:textColor="#1A1A2E"
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="👤  " android:textSize="16sp"/>
+            <EditText android:id="@+id/etName" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:hint="e.g. Rahul, Mom, Wifey"
+                android:background="@null" android:textSize="15sp" android:textColor="#1A1A2E"
                 android:textColorHint="#AAAACC"/>
         </LinearLayout>
 
-        <!-- Phone -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Phone number (optional)"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A2E"
-            android:layout_marginBottom="8dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Phone number (optional)" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#1A1A2E" android:layout_marginBottom="8dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+            android:orientation="horizontal" android:background="#FFFFFF"
+            android:gravity="center_vertical" android:paddingHorizontal="16dp"
             android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📞  "
-                android:textSize="16sp"/>
-
-            <EditText
-                android:id="@+id/etPhone"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="Send greetings directly with a tap"
-                android:background="@null"
-                android:inputType="phone"
-                android:textSize="15sp"
-                android:textColor="#1A1A2E"
-                android:textColorHint="#AAAACC"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="📞  " android:textSize="16sp"/>
+            <EditText android:id="@+id/etPhone" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:hint="+91 98765 43210"
+                android:background="@null" android:inputType="phone" android:textSize="15sp"
+                android:textColor="#1A1A2E" android:textColorHint="#AAAACC"/>
         </LinearLayout>
 
-        <!-- Occasion -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
             android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Occasion"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A2E"/>
-
-            <Spinner
-                android:id="@+id/spinnerCat"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="#EDE9FF"
-                android:padding="8dp"
-                android:entries="@array/categories"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Occasion" android:textSize="15sp"
+                android:textStyle="bold" android:textColor="#1A1A2E"/>
+            <Spinner android:id="@+id/spinnerCat" android:layout_width="wrap_content"
+                android:layout_height="40dp" android:background="#EDE9FF"
+                android:entries="@array/categories" android:spinnerMode="dropdown"/>
         </LinearLayout>
 
-        <!-- Relationship -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="When is it?" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#1A1A2E" android:layout_marginBottom="8dp"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Relationship"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A2E"/>
-
-            <Spinner
-                android:id="@+id/spinnerRel"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="#EDE9FF"
-                android:padding="8dp"
-                android:entries="@array/relationships"/>
+        <LinearLayout android:id="@+id/datePickerRow" android:layout_width="match_parent"
+            android:layout_height="52dp" android:orientation="horizontal"
+            android:background="#FFFFFF" android:gravity="center_vertical"
+            android:paddingHorizontal="16dp" android:layout_marginBottom="4dp"
+            android:clickable="true" android:focusable="true">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="📅  " android:textSize="16sp"/>
+            <TextView android:id="@+id/tvDateDisplay" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="Tap to select date" android:textSize="15sp" android:textColor="#AAAACC"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="›" android:textSize="20sp" android:textColor="#6B4EFF"/>
         </LinearLayout>
 
-        <!-- When is it -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="When is it?"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A2E"
-            android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etDate" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:visibility="gone"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="✅ Reminder repeats automatically every year!"
+            android:textSize="12sp" android:textColor="#059669" android:layout_marginBottom="16dp"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
             android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📅  "
-                android:textSize="16sp"/>
-
-            <EditText
-                android:id="@+id/etDate"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:hint="YYYY-MM-DD"
-                android:background="@null"
-                android:textSize="15sp"
-                android:textColor="#1A1A2E"
-                android:textColorHint="#AAAACC"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Emoji Level" android:textSize="15sp"
+                android:textStyle="bold" android:textColor="#1A1A2E"/>
+            <Spinner android:id="@+id/spinnerEmoji" android:layout_width="wrap_content"
+                android:layout_height="40dp" android:background="#EDE9FF"
+                android:entries="@array/emojis" android:spinnerMode="dropdown"/>
         </LinearLayout>
 
-        <!-- Repeat yearly toggle -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Repeat Yearly?"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A2E"/>
-
-            <Switch
-                android:id="@+id/switchRepeat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:thumbTint="#6B4EFF"
-                android:trackTint="#C4B5FD"/>
-        </LinearLayout>
-
-        <!-- Personalize section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💬"
-                    android:textSize="18sp"
-                    android:layout_marginEnd="8dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Personalize your greeting"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A2E"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:background="#FFFFFF"
+            android:padding="16dp" android:layout_marginBottom="16dp">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💬  " android:textSize="16sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Add a personal touch" android:textSize="15sp"
+                    android:textStyle="bold" android:textColor="#1A1A2E"/>
             </LinearLayout>
-
-            <!-- Tone -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Tone"
-                    android:textSize="14sp"
-                    android:textColor="#1A1A2E"/>
-
-                <Spinner
-                    android:id="@+id/spinnerLen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:background="#EDE9FF"
-                    android:padding="6dp"
-                    android:entries="@array/lengths"/>
-            </LinearLayout>
-
-            <!-- Message Length -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Message Length"
-                    android:textSize="14sp"
-                    android:textColor="#1A1A2E"/>
-
-                <Spinner
-                    android:id="@+id/spinnerEmoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:background="#EDE9FF"
-                    android:padding="6dp"
-                    android:entries="@array/emojis"/>
-            </LinearLayout>
-
-            <!-- Personal touch -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add a personal touch (recommended)"
-                android:textSize="14sp"
-                android:textColor="#1A1A2E"
-                android:layout_marginBottom="8dp"/>
-
-            <EditText
-                android:id="@+id/etPersonal"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:hint="e.g. We met in college / She's a great singer / He just had a baby"
-                android:background="#F2F0FF"
-                android:padding="12dp"
-                android:gravity="top"
-                android:textSize="13sp"
-                android:textColorHint="#AAAACC"/>
+            <EditText android:id="@+id/etPersonal" android:layout_width="match_parent"
+                android:layout_height="80dp" android:hint="e.g. We met in college / She loves singing"
+                android:background="#F2F0FF" android:padding="12dp" android:gravity="top"
+                android:textSize="13sp" android:textColor="#1A1A2E" android:textColorHint="#AAAACC"/>
         </LinearLayout>
 
-        <!-- Reminder time -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="⏰ Remind me at" android:textSize="15sp" android:textStyle="bold"
+            android:textColor="#1A1A2E" android:layout_marginBottom="8dp"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="⏰ Remind me at"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A2E"/>
-
-            <NumberPicker
-                android:id="@+id/hourPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" : "
-                android:textSize="18sp"
-                android:textColor="#6B4EFF"
-                android:textStyle="bold"/>
-
-            <NumberPicker
-                android:id="@+id/minPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <LinearLayout android:id="@+id/timePickerRow" android:layout_width="match_parent"
+            android:layout_height="52dp" android:orientation="horizontal"
+            android:background="#FFFFFF" android:gravity="center_vertical"
+            android:paddingHorizontal="16dp" android:layout_marginBottom="4dp"
+            android:clickable="true" android:focusable="true">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🕐  " android:textSize="16sp"/>
+            <TextView android:id="@+id/tvTimeDisplay" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="9:00 AM" android:textSize="15sp" android:textColor="#1A1A2E"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="›" android:textSize="20sp" android:textColor="#6B4EFF"/>
         </LinearLayout>
+
+        <EditText android:id="@+id/etHour" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:visibility="gone" android:text="9"/>
+        <EditText android:id="@+id/etMin" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:visibility="gone" android:text="0"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="You'll get a notification every year at this time 🔔"
+            android:textSize="12sp" android:textColor="#059669" android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
 </ScrollView>
