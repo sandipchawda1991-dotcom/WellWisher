@@ -10,11 +10,12 @@ import androidx.core.app.NotificationCompat
 import java.util.Calendar
 
 class BirthdayReceiver : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_MY_PACKAGE_REPLACED,
-            Intent.ACTION_TIME_SET -> {
+            "android.intent.action.MY_PACKAGE_REPLACED",
+            "android.intent.action.TIME_SET" -> {
                 rescheduleAll(context)
                 return
             }
@@ -49,26 +50,20 @@ class BirthdayReceiver : BroadcastReceiver() {
             .setContentIntent(pi)
             .build()
 
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.notify(contactId.hashCode(), notification)
+        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            .notify(contactId.hashCode(), notification)
 
         // Reschedule for next year
-        rescheduleOne(context, name, cat, contactId, intent)
-    }
-
-    private fun rescheduleOne(
-        context: Context, name: String, cat: String,
-        contactId: String, originalIntent: Intent
-    ) {
         val prefs = context.getSharedPreferences("wellwisher", Context.MODE_PRIVATE)
         val arr = org.json.JSONArray(prefs.getString("contacts", "[]") ?: "[]")
         for (i in 0 until arr.length()) {
             val o = arr.getJSONObject(i)
             if (o.optString("id") == contactId) {
-                val date = o.optString("date", "")
-                val h = o.optInt("remindHour", 9)
-                val m = o.optInt("remindMin", 0)
-                scheduleAlarm(context, contactId, name, cat, date, h, m, nextYear = true)
+                scheduleAlarm(context, contactId, name, cat,
+                    o.optString("date", ""),
+                    o.optInt("remindHour", 9),
+                    o.optInt("remindMin", 0),
+                    nextYear = true)
                 break
             }
         }
@@ -123,7 +118,6 @@ class BirthdayReceiver : BroadcastReceiver() {
                     if (before(now)) add(Calendar.YEAR, 1)
                 }
             }
-            // Use setAlarmClock for reliable delivery even in Doze mode
             val alarmInfo = AlarmManager.AlarmClockInfo(cal.timeInMillis, pi)
             am.setAlarmClock(alarmInfo, pi)
         } catch (e: Exception) {
