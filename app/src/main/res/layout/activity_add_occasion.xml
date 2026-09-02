@@ -56,7 +56,6 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Who -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Who is this for?" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
@@ -71,12 +70,11 @@
                         android:text="👤" android:textSize="20sp" android:layout_marginEnd="12dp"/>
                     <EditText android:id="@+id/etName" android:layout_width="match_parent"
                         android:layout_height="match_parent" android:hint="e.g. Rahul, Mom, Wifey"
-                        android:background="@null" android:textSize="15sp" android:textColor="#1A1A2E"
-                        android:textColorHint="#AAAACC"/>
+                        android:background="@null" android:textSize="15sp"
+                        android:textColor="#1A1A2E" android:textColorHint="#AAAACC"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Phone with contact picker -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Phone number (for WhatsApp)" android:textSize="14sp"
                 android:textStyle="bold" android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
@@ -106,10 +104,8 @@
             </androidx.cardview.widget.CardView>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Tap 👥 to pick from contacts or type manually"
-                android:textSize="11sp" android:textColor="#6B4EFF"
-                android:layout_marginBottom="16dp"/>
+                android:textSize="11sp" android:textColor="#6B4EFF" android:layout_marginBottom="16dp"/>
 
-            <!-- Occasion type -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Occasion type" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
@@ -141,7 +137,6 @@
             <EditText android:id="@+id/etCat" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:visibility="gone" android:text="birthday"/>
 
-            <!-- Date -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="When is it?" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
@@ -168,7 +163,6 @@
                 android:text="Repeats every year automatically"
                 android:textSize="12sp" android:textColor="#059669" android:layout_marginBottom="16dp"/>
 
-            <!-- Emoji -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Emoji level in message" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
@@ -201,7 +195,6 @@
             <EditText android:id="@+id/etEmoji" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:visibility="gone" android:text="few"/>
 
-            <!-- Time -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Remind me at" android:textSize="14sp" android:textStyle="bold"
                 android:textColor="#6B4EFF" android:layout_marginBottom="8dp"/>
