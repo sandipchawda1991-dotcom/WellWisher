@@ -5,90 +5,83 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Party popper body -->
-    <path
-        android:fillColor="#FF8C42"
-        android:pathData="M28,78 L54,44 L68,58 Z"/>
+    <!-- Calendar base shadow -->
+    <path android:fillColor="#3D0080"
+        android:pathData="M24,32 L84,32 L84,86 L24,86 Z"/>
 
-    <!-- Party popper cone -->
-    <path
-        android:fillColor="#FFB347"
-        android:pathData="M54,44 L68,58 L73,50 L62,36 Z"/>
+    <!-- Calendar main body gradient effect -->
+    <path android:fillColor="#C850C0"
+        android:pathData="M22,30 L86,30 L86,84 L22,84 Z"/>
 
-    <!-- Confetti dots using path circles -->
+    <!-- Calendar gradient overlay -->
+    <path android:fillColor="#8B5CF6"
+        android:pathData="M22,30 L86,30 L54,57 Z"/>
+
+    <!-- Calendar top bar -->
+    <path android:fillColor="#A855F7"
+        android:pathData="M22,30 L86,30 L86,42 L22,42 Z"/>
+
+    <!-- Calendar rings left -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3"
+        android:strokeLineCap="round" android:fillColor="@android:color/transparent"
+        android:pathData="M36,24 L36,36"/>
+    <!-- Calendar rings middle -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3"
+        android:strokeLineCap="round" android:fillColor="@android:color/transparent"
+        android:pathData="M54,24 L54,36"/>
+    <!-- Calendar rings right -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3"
+        android:strokeLineCap="round" android:fillColor="@android:color/transparent"
+        android:pathData="M72,24 L72,36"/>
+
+    <!-- Grid dots row 1 -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M32,50 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M43,50 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M54,50 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M65,50 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M76,50 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+
+    <!-- Grid dots row 2 -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M32,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M43,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <!-- Highlighted date -->
     <path android:fillColor="#FF6B9D"
-        android:pathData="M72,35 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
-    <path android:fillColor="#6B4EFF"
-        android:pathData="M65,28 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0"/>
-    <path android:fillColor="#4ECDC4"
-        android:pathData="M80,42 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
+        android:pathData="M54,61 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M65,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M76,61 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+
+    <!-- Grid dots row 3 -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M32,72 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M43,72 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M54,72 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M65,72 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+
+    <!-- Sparkle top right -->
+    <path android:strokeColor="#FFD700" android:strokeWidth="2.5"
+        android:strokeLineCap="round" android:pathData="M88,20 L88,28"/>
+    <path android:strokeColor="#FFD700" android:strokeWidth="2.5"
+        android:strokeLineCap="round" android:pathData="M84,24 L92,24"/>
+
+    <!-- Small sparkle -->
+    <path android:strokeColor="#FF6B9D" android:strokeWidth="2"
+        android:strokeLineCap="round" android:pathData="M92,38 L92,44"/>
+    <path android:strokeColor="#FF6B9D" android:strokeWidth="2"
+        android:strokeLineCap="round" android:pathData="M89,41 L95,41"/>
+
+    <!-- Star -->
     <path android:fillColor="#FFD700"
-        android:pathData="M78,30 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
-    <path android:fillColor="#FF8C42"
-        android:pathData="M58,25 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
-    <path android:fillColor="#FF6B9D"
-        android:pathData="M85,35 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0"/>
-    <path android:fillColor="#6B4EFF"
-        android:pathData="M75,48 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
-    <path android:fillColor="#4ECDC4"
-        android:pathData="M88,25 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"/>
-
-    <!-- Confetti rectangles -->
-    <path android:fillColor="#4ECDC4"
-        android:pathData="M68,22 L73,22 L73,25 L68,25 Z"/>
-    <path android:fillColor="#FF6B9D"
-        android:pathData="M82,28 L86,28 L86,31 L82,31 Z"/>
-    <path android:fillColor="#FFD700"
-        android:pathData="M60,32 L64,32 L64,35 L60,35 Z"/>
-    <path android:fillColor="#6B4EFF"
-        android:pathData="M90,40 L94,40 L94,43 L90,43 Z"/>
-
-    <!-- Star shape -->
-    <path
-        android:fillColor="#FFD700"
-        android:pathData="M54,18 L55.8,23.5 L61.5,23.5 L56.9,26.8 L58.7,32.3 L54,29 L49.3,32.3 L51.1,26.8 L46.5,23.5 L52.2,23.5 Z"/>
-
-    <!-- Sparkle cross top right -->
-    <path
-        android:strokeColor="#FFD700"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round"
-        android:pathData="M83,20 L83,26"/>
-    <path
-        android:strokeColor="#FFD700"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round"
-        android:pathData="M80,23 L86,23"/>
-
-    <!-- Sparkle cross right -->
-    <path
-        android:strokeColor="#FF6B9D"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M91,38 L91,44"/>
-    <path
-        android:strokeColor="#FF6B9D"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M88,41 L94,41"/>
-
-    <!-- Streamers -->
-    <path
-        android:strokeColor="#FFD700"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round"
-        android:fillColor="@android:color/transparent"
-        android:pathData="M40,24 Q45,14 50,24 Q55,34 60,24 Q65,14 70,24"/>
-    <path
-        android:strokeColor="#FF6B9D"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:fillColor="@android:color/transparent"
-        android:pathData="M35,30 Q30,18 36,14"/>
-    <path
-        android:strokeColor="#4ECDC4"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:fillColor="@android:color/transparent"
-        android:pathData="M73,30 Q78,18 72,14"/>
+        android:pathData="M18,38 L19.2,41.6 L23,41.6 L20,43.8 L21.2,47.4 L18,45.2 L14.8,47.4 L16,43.8 L13,41.6 L16.8,41.6 Z"/>
 </vector>
