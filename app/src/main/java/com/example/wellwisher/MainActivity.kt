@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.recyclerView)
         adapter = ContactAdapter(contacts,
             onDelete = { deleteContact(it) },
+            onEdit = { showEditDialog(it) },
             onWhatsApp = { openWhatsApp(it) },
             onShare = { shareWish(it) },
             onCopy = { copyWish(it) },
@@ -98,6 +99,51 @@ class MainActivity : AppCompatActivity() {
                 saveContacts()
                 scheduleReminder(contact)
                 adapter.notifyItemInserted(contacts.size - 1)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showEditDialog(contact: Contact) {
+        val view = layoutInflater.inflate(R.layout.dialog_add, null)
+        view.findViewById<EditText>(R.id.etName).setText(contact.name)
+        view.findViewById<EditText>(R.id.etPhone).setText(contact.phone)
+        view.findViewById<EditText>(R.id.etDate).setText(contact.date)
+        val hourPicker = view.findViewById<NumberPicker>(R.id.hourPicker).apply {
+            minValue = 0; maxValue = 23; value = contact.remindHour
+        }
+        val minPicker = view.findViewById<NumberPicker>(R.id.minPicker).apply {
+            minValue = 0; maxValue = 59; value = contact.remindMin
+        }
+        val cats = listOf("birthday","anniversary","work","graduation","newbaby","friendship","custom")
+        val rels = listOf("friend","family","colleague","boss","partner","other")
+        val lens = listOf("vshort","short","long","vlong")
+        val emojis = listOf("none","few","more")
+        view.findViewById<Spinner>(R.id.spinnerCat).setSelection(cats.indexOf(contact.cat).coerceAtLeast(0))
+        view.findViewById<Spinner>(R.id.spinnerRel).setSelection(rels.indexOf(contact.rel).coerceAtLeast(0))
+        view.findViewById<Spinner>(R.id.spinnerLen).setSelection(lens.indexOf(contact.msgLen).coerceAtLeast(0))
+        view.findViewById<Spinner>(R.id.spinnerEmoji).setSelection(emojis.indexOf(contact.emojiStyle).coerceAtLeast(0))
+        AlertDialog.Builder(this)
+            .setTitle("Edit ${contact.name}")
+            .setView(view)
+            .setPositiveButton("Save") { _, _ ->
+                val idx = contacts.indexOf(contact)
+                val updated = contact.copy(
+                    name = view.findViewById<EditText>(R.id.etName).text.toString().trim(),
+                    phone = view.findViewById<EditText>(R.id.etPhone).text.toString().trim(),
+                    date = view.findViewById<EditText>(R.id.etDate).text.toString().trim(),
+                    cat = cats[view.findViewById<Spinner>(R.id.spinnerCat).selectedItemPosition],
+                    rel = rels[view.findViewById<Spinner>(R.id.spinnerRel).selectedItemPosition],
+                    msgLen = lens[view.findViewById<Spinner>(R.id.spinnerLen).selectedItemPosition],
+                    emojiStyle = emojis[view.findViewById<Spinner>(R.id.spinnerEmoji).selectedItemPosition],
+                    remindHour = hourPicker.value,
+                    remindMin = minPicker.value
+                )
+                contacts[idx] = updated
+                saveContacts()
+                scheduleReminder(updated)
+                adapter.notifyItemChanged(idx)
+                Toast.makeText(this, "${updated.name} updated!", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -150,13 +196,16 @@ class MainActivity : AppCompatActivity() {
         )
         try {
             val parts = contact.date.split("-")
+            val now = Calendar.getInstance()
             val cal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, now.get(Calendar.YEAR))
                 set(Calendar.MONTH, parts[1].toInt() - 1)
                 set(Calendar.DAY_OF_MONTH, parts[2].toInt())
                 set(Calendar.HOUR_OF_DAY, contact.remindHour)
                 set(Calendar.MINUTE, contact.remindMin)
                 set(Calendar.SECOND, 0)
-                if (before(Calendar.getInstance())) add(Calendar.YEAR, 1)
+                set(Calendar.MILLISECOND, 0)
+                if (before(now)) add(Calendar.YEAR, 1)
             }
             am.set(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi)
         } catch (e: Exception) { e.printStackTrace() }
@@ -177,6 +226,35 @@ class MainActivity : AppCompatActivity() {
         return try {
             Calendar.getInstance().get(Calendar.YEAR) - dateStr.split("-")[0].toInt()
         } catch (e: Exception) { 0 }
+    }
+
+    private fun daysUntil(dateStr: String): Int {
+        return try {
+            val parts = dateStr.split("-")
+            val now = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val next = Calendar.getInstance().apply {
+                set(Calendar.YEAR, now.get(Calendar.YEAR))
+                set(Calendar.MONTH, parts[1].toInt() - 1)
+                set(Calendar.DAY_OF_MONTH, parts[2].toInt())
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                if (before(now) || timeInMillis == now.timeInMillis) {
+                    if (timeInMillis == now.timeInMillis) {
+                        // it's today!
+                    } else {
+                        add(Calendar.YEAR, 1)
+                    }
+                }
+            }
+            ((next.timeInMillis - now.timeInMillis) / 86400000).toInt()
+        } catch (e: Exception) { 999 }
     }
 
     private fun getWish(contact: Contact): String {
@@ -202,8 +280,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getWishList(contact: Contact): List<String> {
-        val n = "{n}"
-        val y = "{ordinal}"
         return when (contact.cat) {
             "anniversary" -> listOf(
                 "Happy {ordinal} Anniversary {n}! 💑 Wishing you both endless love and happiness. May your bond grow stronger every year! 🥂",
@@ -287,20 +363,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun daysUntil(dateStr: String): Int {
-        return try {
-            val parts = dateStr.split("-")
-            val now = Calendar.getInstance()
-            val next = Calendar.getInstance().apply {
-                set(Calendar.MONTH, parts[1].toInt() - 1)
-                set(Calendar.DAY_OF_MONTH, parts[2].toInt())
-                set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
-                if (before(now)) add(Calendar.YEAR, 1)
-            }
-            ((next.timeInMillis - now.timeInMillis) / 86400000).toInt()
-        } catch (e: Exception) { 999 }
-    }
-
     private fun saveContacts() {
         val arr = JSONArray()
         contacts.forEach { c ->
@@ -346,6 +408,7 @@ class MainActivity : AppCompatActivity() {
     inner class ContactAdapter(
         private val list: MutableList<Contact>,
         private val onDelete: (Contact) -> Unit,
+        private val onEdit: (Contact) -> Unit,
         private val onWhatsApp: (Contact) -> Unit,
         private val onShare: (Contact) -> Unit,
         private val onCopy: (Contact) -> Unit,
@@ -358,6 +421,7 @@ class MainActivity : AppCompatActivity() {
             val tvMeta: TextView = v.findViewById(R.id.tvMeta)
             val tvDays: TextView = v.findViewById(R.id.tvDays)
             val tvWish: TextView = v.findViewById(R.id.tvWish)
+            val btnEdit: ImageButton = v.findViewById(R.id.btnEdit)
             val btnDelete: ImageButton = v.findViewById(R.id.btnDelete)
             val btnWhatsApp: Button = v.findViewById(R.id.btnWhatsApp)
             val btnShare: Button = v.findViewById(R.id.btnShare)
@@ -380,6 +444,7 @@ class MainActivity : AppCompatActivity() {
             val days = daysUntil(c.date)
             holder.tvDays.text = if (days == 0) "🎉 Today!" else "📅 $days days away"
             holder.tvWish.text = "\"${getWish(c).take(150)}\""
+            holder.btnEdit.setOnClickListener { onEdit(c) }
             holder.btnDelete.setOnClickListener { onDelete(c) }
             holder.btnWhatsApp.setOnClickListener { onWhatsApp(c) }
             holder.btnShare.setOnClickListener { onShare(c) }
