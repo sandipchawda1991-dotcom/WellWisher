@@ -23,13 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.Scope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -54,7 +48,6 @@ class MainActivity : AppCompatActivity() {
     private val filtered = mutableListOf<Contact>()
     private lateinit var adapter: ContactAdapter
     private var currentFilter = "all"
-    private lateinit var driveBackup: DriveBackupManager
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -63,23 +56,11 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this,
                 "Notifications enabled! You will be reminded on every birthday and anniversary.",
                 Toast.LENGTH_LONG).show()
+            scheduleAllReminders()
         } else {
             Toast.makeText(this,
-                "Notifications disabled. Enable in Settings > Apps > WellWisher > Notifications",
+                "Notifications disabled. Go to Settings > Apps > WellWisher > Notifications to enable.",
                 Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            task.getResult(Exception::class.java)
-            Toast.makeText(this, "Google account connected!", Toast.LENGTH_SHORT).show()
-            performBackup()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Google sign in failed. Try again.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -87,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
-        driveBackup = DriveBackupManager(this)
         prefs = getSharedPreferences("wellwisher", Context.MODE_PRIVATE)
 
         val name = prefs.getString("user_name", "") ?: ""
@@ -105,118 +85,137 @@ class MainActivity : AppCompatActivity() {
 
         if (name.isEmpty()) askUserName()
 
+        // Ask notification permission on first launch
         if (!prefs.getBoolean("notif_asked", false)) {
             prefs.edit().putBoolean("notif_asked", true).apply()
             requestNotificationPermission()
+        } else {
+            checkNotificationPermission()
         }
 
         updateList()
         scheduleAllReminders()
     }
 
+    private fun checkNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else true
+    }
+
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when {
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        == PackageManager.PERMISSION_GRANTED -> { }
-                else -> {
-                    AlertDialog.Builder(this)
-                        .setTitle("Stay Reminded!")
-                        .setMessage("Allow WellWisher to send you birthday and anniversary reminders so you never miss a special moment!")
-                        .setPositiveButton("Allow") { _, _ ->
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                        .setNegativeButton("Skip", null)
-                        .show()
+            AlertDialog.Builder(this)
+                .setTitle("🔔 Stay Reminded!")
+                .setMessage("Allow WellWisher to send you birthday and anniversary reminders so you never miss a special moment!")
+                .setPositiveButton("Allow") { _, _ ->
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
-            }
+                .setNegativeButton("Skip", null)
+                .show()
         }
     }
 
     private fun showProfileMenu() {
         val name = prefs.getString("user_name", "") ?: ""
-        val isSignedIn = GoogleSignIn.getLastSignedInAccount(this) != null
         val items = arrayOf(
             "✏️ Change my name",
-            if (isSignedIn) "☁️ Backup to Google Drive" else "☁️ Connect Google Drive",
-            if (isSignedIn) "🔄 Restore from Drive" else "🔔 Enable Notifications"
+            "☁️ Backup data (share as text)",
+            "📥 Restore data",
+            "🔔 Check notification status"
         )
         AlertDialog.Builder(this)
             .setTitle(if (name.isEmpty()) "WellWisher" else "Hi $name!")
             .setItems(items) { _, which ->
                 when (which) {
                     0 -> askUserName()
-                    1 -> if (isSignedIn) performBackup() else signInToGoogle()
-                    2 -> if (isSignedIn) performRestore() else requestNotificationPermission()
+                    1 -> backupData()
+                    2 -> restoreData()
+                    3 -> checkAndShowNotificationStatus()
                 }
             }.show()
     }
 
-    private fun signInToGoogle() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestServerAuthCode(getString(R.string.app_name))
-            .build()
-        val client = GoogleSignIn.getClient(this, gso)
-        googleSignInLauncher.launch(client.signInIntent)
-    }
-
-    private fun performBackup() {
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-        val token = account?.idToken
-        if (token == null) {
-            Toast.makeText(this, "Please connect Google Drive first", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun backupData() {
         val data = prefs.getString("contacts", "[]") ?: "[]"
-        Toast.makeText(this, "Backing up to Google Drive...", Toast.LENGTH_SHORT).show()
-        CoroutineScope(Dispatchers.Main).launch {
-            val success = driveBackup.backupToDrive(data, token)
-            if (success) {
-                prefs.edit().putLong("last_backup", System.currentTimeMillis()).apply()
-                Toast.makeText(this@MainActivity,
-                    "Backup successful! Your data is safe on Google Drive.",
-                    Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this@MainActivity,
-                    "Backup failed. Check your internet connection.",
-                    Toast.LENGTH_SHORT).show()
-            }
+        val count = contacts.size
+        // Share as text so user can save anywhere
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "WellWisher Backup")
+            putExtra(Intent.EXTRA_TEXT, "WELLWISHER_BACKUP:$data")
         }
+        startActivity(Intent.createChooser(intent,
+            "Save backup ($count contacts) — save to Notes, Drive, Email etc."))
     }
 
-    private fun performRestore() {
+    private fun restoreData() {
+        val input = EditText(this).apply {
+            hint = "Paste your backup text here"
+            textSize = 14f
+            minLines = 3
+            maxLines = 6
+            setPadding(32, 16, 32, 16)
+        }
         AlertDialog.Builder(this)
-            .setTitle("Restore from Drive?")
-            .setMessage("This will replace your current contacts with the backup from Google Drive. Continue?")
+            .setTitle("📥 Restore Data")
+            .setMessage("Paste the backup text you saved earlier:")
+            .setView(input)
             .setPositiveButton("Restore") { _, _ ->
-                Toast.makeText(this, "Restoring from Google Drive...", Toast.LENGTH_SHORT).show()
-                CoroutineScope(Dispatchers.Main).launch {
-                    val account = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
-                    val token = account?.idToken
-                    if (token == null) {
-                        Toast.makeText(this@MainActivity,
-                            "Please connect Google Drive first", Toast.LENGTH_SHORT).show()
-                        return@launch
-                    }
-                    val data = driveBackup.restoreFromDrive(token)
-                    if (data != null) {
+                val text = input.text.toString().trim()
+                if (text.startsWith("WELLWISHER_BACKUP:")) {
+                    val data = text.removePrefix("WELLWISHER_BACKUP:")
+                    try {
+                        JSONArray(data) // validate
                         prefs.edit().putString("contacts", data).apply()
                         loadContacts()
                         updateList()
                         setupCalendarStrip()
                         scheduleAllReminders()
-                        Toast.makeText(this@MainActivity,
-                            "Restore successful! ${contacts.size} contacts restored.",
+                        Toast.makeText(this,
+                            "${contacts.size} contacts restored successfully!",
                             Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(this@MainActivity,
-                            "No backup found or restore failed.",
+                    } catch (e: Exception) {
+                        Toast.makeText(this,
+                            "Invalid backup data. Please check and try again.",
                             Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    Toast.makeText(this,
+                        "Invalid backup format. Make sure you copied the full backup text.",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun checkAndShowNotificationStatus() {
+        val enabled = checkNotificationPermission()
+        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val canScheduleExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            am.canScheduleExactAlarms()
+        } else true
+
+        val status = buildString {
+            append("Notifications: ${if (enabled) "✅ Enabled" else "❌ Disabled"}\n\n")
+            append("Exact Alarms: ${if (canScheduleExact) "✅ Allowed" else "❌ Not allowed"}\n\n")
+            append("Reminders set: ${contacts.size}\n\n")
+            if (!enabled) append("Go to Settings > Apps > WellWisher > Notifications to enable.\n\n")
+            if (!canScheduleExact) append("Go to Settings > Apps > WellWisher > Alarms & Reminders to allow.")
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("🔔 Notification Status")
+            .setMessage(status)
+            .setPositiveButton("Open Settings") { _, _ ->
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = android.net.Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("OK", null)
             .show()
     }
 
@@ -226,7 +225,6 @@ class MainActivity : AppCompatActivity() {
             loadContacts()
             updateList()
             setupCalendarStrip()
-            if (GoogleSignIn.getLastSignedInAccount(this) != null) performBackup()
         }
     }
 
@@ -439,44 +437,28 @@ class MainActivity : AppCompatActivity() {
                 saveContacts()
                 updateList()
                 setupCalendarStrip()
-                if (GoogleSignIn.getLastSignedInAccount(this) != null) performBackup()
                 Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null).show()
     }
 
-    private fun scheduleAllReminders() { contacts.forEach { scheduleYearlyReminder(it) } }
-
-    private fun scheduleYearlyReminder(contact: Contact) {
-        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, BirthdayReceiver::class.java).apply {
-            putExtra("name", contact.name)
-            putExtra("cat", contact.cat)
-            putExtra("contact_id", contact.id)
+    fun scheduleAllReminders() {
+        val receiver = BirthdayReceiver()
+        contacts.forEach { c ->
+            receiver.scheduleAlarm(
+                this, c.id, c.name, c.cat, c.date,
+                c.remindHour, c.remindMin, nextYear = false
+            )
         }
-        val pi = PendingIntent.getBroadcast(this, contact.id.hashCode(), intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        try {
-            val parts = contact.date.split("-")
-            val now = Calendar.getInstance()
-            val cal = Calendar.getInstance().apply {
-                set(Calendar.MONTH, parts[1].toInt() - 1)
-                set(Calendar.DAY_OF_MONTH, parts[2].toInt())
-                set(Calendar.HOUR_OF_DAY, contact.remindHour)
-                set(Calendar.MINUTE, contact.remindMin)
-                set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-                if (before(now)) add(Calendar.YEAR, 1)
-            }
-            am.setRepeating(AlarmManager.RTC_WAKEUP, cal.timeInMillis,
-                365L * 24 * 60 * 60 * 1000, pi)
-        } catch (e: Exception) { e.printStackTrace() }
     }
 
     private fun cancelReminder(contact: Contact) {
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pi = PendingIntent.getBroadcast(this, contact.id.hashCode(),
+        val pi = PendingIntent.getBroadcast(
+            this, contact.id.hashCode(),
             Intent(this, BirthdayReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         am.cancel(pi)
     }
 
@@ -540,10 +522,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createNotificationChannel() {
-        val channel = NotificationChannel("wellwisher", "WellWisher Reminders",
-            NotificationManager.IMPORTANCE_HIGH).apply {
+        val channel = NotificationChannel(
+            "wellwisher", "WellWisher Reminders",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
             description = "Birthday and anniversary reminders"
             enableVibration(true)
+            setShowBadge(true)
         }
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
             .createNotificationChannel(channel)
@@ -604,11 +589,8 @@ class MainActivity : AppCompatActivity() {
 
         private fun ordinal(n: Int): String {
             val s = when {
-                n % 100 in 11..13 -> "th"
-                n % 10 == 1 -> "st"
-                n % 10 == 2 -> "nd"
-                n % 10 == 3 -> "rd"
-                else -> "th"
+                n % 100 in 11..13 -> "th"; n % 10 == 1 -> "st"
+                n % 10 == 2 -> "nd"; n % 10 == 3 -> "rd"; else -> "th"
             }
             return "$n$s"
         }
