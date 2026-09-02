@@ -18,12 +18,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 data class Contact(
     val id: String = UUID.randomUUID().toString(),
@@ -53,7 +51,6 @@ class MainActivity : AppCompatActivity() {
 
         val name = prefs.getString("user_name", "") ?: ""
         updateGreeting(name)
-
         loadContacts()
 
         val rv = findViewById<RecyclerView>(R.id.recyclerView)
@@ -64,9 +61,7 @@ class MainActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
 
-        findViewById<FloatingActionButton>(R.id.fabAdd).setOnClickListener {
-            showAddDialog()
-        }
+        findViewById<FloatingActionButton>(R.id.fabAdd).setOnClickListener { showAddDialog() }
 
         val search = findViewById<EditText>(R.id.etSearch)
         search.addTextChangedListener(object : android.text.TextWatcher {
@@ -75,9 +70,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
         })
 
-        val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
-        tvGreeting.setOnClickListener { askUserName() }
-
+        findViewById<TextView>(R.id.tvGreeting).setOnClickListener { askUserName() }
         if (name.isEmpty()) askUserName()
 
         updateList()
@@ -88,11 +81,11 @@ class MainActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             hint = "Your name e.g. Sandip"
             textSize = 16f
-            setPadding(40, 20, 40, 20)
+            setPadding(48, 24, 48, 24)
             setText(prefs.getString("user_name", ""))
         }
         AlertDialog.Builder(this)
-            .setTitle("What's your name?")
+            .setTitle("What's your name? 👋")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
                 val n = input.text.toString().trim()
@@ -124,8 +117,8 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         updateEmptyState()
         val todayCount = contacts.count { daysUntil(it.date) == 0 }
-        val title = if (todayCount > 0) "Today's Celebrations 🎉" else "Upcoming Occasions 📅"
-        findViewById<TextView>(R.id.tvSectionTitle).text = title
+        findViewById<TextView>(R.id.tvSectionTitle).text =
+            if (todayCount > 0) "Today's Celebrations 🎉" else "Upcoming Occasions 📅"
     }
 
     private fun updateEmptyState() {
@@ -137,9 +130,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun openWishScreen(contact: Contact) {
         saveContacts()
-        val intent = Intent(this, WishActivity::class.java)
-        intent.putExtra("contact_id", contact.id)
-        startActivity(intent)
+        startActivity(Intent(this, WishActivity::class.java).apply {
+            putExtra("contact_id", contact.id)
+        })
     }
 
     private fun showAddDialog(existing: Contact? = null) {
@@ -147,19 +140,18 @@ class MainActivity : AppCompatActivity() {
         val cats = listOf("birthday", "anniversary")
         val emojis = listOf("none", "few", "lots")
 
-        var selectedDay = -1
-        var selectedMonth = -1
-        var selectedYear = -1
-        var selectedHour = existing?.remindHour ?: 9
-        var selectedMin = existing?.remindMin ?: 0
+        var selYear = -1; var selMonth = -1; var selDay = -1
+        var selHour = existing?.remindHour ?: 9
+        var selMin = existing?.remindMin ?: 0
 
-        val tvDateDisplay = view.findViewById<TextView>(R.id.tvDateDisplay)
-        val tvTimeDisplay = view.findViewById<TextView>(R.id.tvTimeDisplay)
+        val tvDate = view.findViewById<TextView>(R.id.tvDateDisplay)
+        val tvTime = view.findViewById<TextView>(R.id.tvTimeDisplay)
         val etDate = view.findViewById<EditText>(R.id.etDate)
-        val etHour = view.findViewById<EditText>(R.id.etHour)
-        val etMin = view.findViewById<EditText>(R.id.etMin)
+        val etH = view.findViewById<EditText>(R.id.etHour)
+        val etM = view.findViewById<EditText>(R.id.etMin)
 
-        // Pre-fill if editing
+        tvTime.text = fmtTime(selHour, selMin)
+
         existing?.let {
             view.findViewById<EditText>(R.id.etName).setText(it.name)
             view.findViewById<EditText>(R.id.etPhone).setText(it.phone)
@@ -167,65 +159,53 @@ class MainActivity : AppCompatActivity() {
             view.findViewById<Spinner>(R.id.spinnerCat).setSelection(cats.indexOf(it.cat).coerceAtLeast(0))
             view.findViewById<Spinner>(R.id.spinnerEmoji).setSelection(emojis.indexOf(it.emojiStyle).coerceAtLeast(0))
             etDate.setText(it.date)
-            tvDateDisplay.text = formatDateDisplay(it.date)
-            tvDateDisplay.setTextColor(0xFF1A1A2E.toInt())
-            tvTimeDisplay.text = fmtTime(it.remindHour, it.remindMin)
+            tvDate.text = formatDateDisplay(it.date)
+            tvDate.setTextColor(0xFF1A1A2E.toInt())
+            etH.setText(it.remindHour.toString())
+            etM.setText(it.remindMin.toString())
             try {
-                val parts = it.date.split("-")
-                selectedYear = parts[0].toInt()
-                selectedMonth = parts[1].toInt() - 1
-                selectedDay = parts[2].toInt()
+                val p = it.date.split("-")
+                selYear = p[0].toInt(); selMonth = p[1].toInt()-1; selDay = p[2].toInt()
             } catch (e: Exception) {}
         }
 
-        // Update time display
-        tvTimeDisplay.text = fmtTime(selectedHour, selectedMin)
-
-        // Date picker
+        // Date picker tap
         view.findViewById<View>(R.id.datePickerRow).setOnClickListener {
             val cal = Calendar.getInstance()
-            val initYear = if (selectedYear > 0) selectedYear else cal.get(Calendar.YEAR)
-            val initMonth = if (selectedMonth >= 0) selectedMonth else cal.get(Calendar.MONTH)
-            val initDay = if (selectedDay > 0) selectedDay else cal.get(Calendar.DAY_OF_MONTH)
-            DatePickerDialog(this, { _, year, month, day ->
-                selectedYear = year
-                selectedMonth = month
-                selectedDay = day
-                val dateStr = "$year-${(month+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}"
-                etDate.setText(dateStr)
-                tvDateDisplay.text = formatDateDisplay(dateStr)
-                tvDateDisplay.setTextColor(0xFF1A1A2E.toInt())
-            }, initYear, initMonth, initDay).show()
+            DatePickerDialog(this, { _, y, m, d ->
+                selYear = y; selMonth = m; selDay = d
+                val ds = "$y-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}"
+                etDate.setText(ds)
+                tvDate.text = formatDateDisplay(ds)
+                tvDate.setTextColor(0xFF1A1A2E.toInt())
+            }, if (selYear>0) selYear else cal.get(Calendar.YEAR),
+                if (selMonth>=0) selMonth else cal.get(Calendar.MONTH),
+                if (selDay>0) selDay else cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        // Time picker
+        // Time picker tap
         view.findViewById<View>(R.id.timePickerRow).setOnClickListener {
-            TimePickerDialog(this, { _, hour, min ->
-                selectedHour = hour
-                selectedMin = min
-                etHour.setText(hour.toString())
-                etMin.setText(min.toString())
-                tvTimeDisplay.text = fmtTime(hour, min)
-            }, selectedHour, selectedMin, false).show()
+            TimePickerDialog(this, { _, h, m ->
+                selHour = h; selMin = m
+                etH.setText(h.toString()); etM.setText(m.toString())
+                tvTime.text = fmtTime(h, m)
+            }, selHour, selMin, false).show()
         }
 
-        val title = if (existing == null) "✨ Add Occasion" else "✏️ Edit Occasion"
         AlertDialog.Builder(this)
-            .setTitle(title)
+            .setTitle(if (existing == null) "✨ Add Occasion" else "✏️ Edit Occasion")
             .setView(view)
             .setPositiveButton("Save. I'm Done") { _, _ ->
                 val name = view.findViewById<EditText>(R.id.etName).text.toString().trim()
                 val phone = view.findViewById<EditText>(R.id.etPhone).text.toString().trim()
                 val date = etDate.text.toString().trim()
                 val personal = view.findViewById<EditText>(R.id.etPersonal).text.toString().trim()
-                val hour = etHour.text.toString().toIntOrNull() ?: 9
-                val min = etMin.text.toString().toIntOrNull() ?: 0
-
+                val hour = etH.text.toString().toIntOrNull() ?: 9
+                val min = etM.text.toString().toIntOrNull() ?: 0
                 if (name.isEmpty() || date.isEmpty()) {
                     Toast.makeText(this, "Please fill in name and date", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-
                 val contact = Contact(
                     id = existing?.id ?: UUID.randomUUID().toString(),
                     name = name, phone = phone, date = date,
@@ -238,22 +218,19 @@ class MainActivity : AppCompatActivity() {
                 if (existing != null) {
                     val idx = contacts.indexOfFirst { it.id == existing.id }
                     if (idx >= 0) contacts[idx] = contact
-                } else {
-                    contacts.add(contact)
-                }
+                } else contacts.add(contact)
                 saveContacts()
                 scheduleYearlyReminder(contact)
                 updateList()
                 Toast.makeText(this, "✅ ${contact.name} saved! Reminder set yearly at ${fmtTime(hour, min)}", Toast.LENGTH_LONG).show()
             }
             .setNeutralButton("Save & Add Another") { _, _ ->
-                // same logic, then reopen
                 val name = view.findViewById<EditText>(R.id.etName).text.toString().trim()
                 val phone = view.findViewById<EditText>(R.id.etPhone).text.toString().trim()
                 val date = etDate.text.toString().trim()
                 val personal = view.findViewById<EditText>(R.id.etPersonal).text.toString().trim()
-                val hour = etHour.text.toString().toIntOrNull() ?: 9
-                val min = etMin.text.toString().toIntOrNull() ?: 0
+                val hour = etH.text.toString().toIntOrNull() ?: 9
+                val min = etM.text.toString().toIntOrNull() ?: 0
                 if (name.isNotEmpty() && date.isNotEmpty()) {
                     val contact = Contact(
                         name = name, phone = phone, date = date,
@@ -276,10 +253,7 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(contact.name)
             .setItems(arrayOf("✏️ Edit", "🗑️ Delete")) { _, which ->
-                when (which) {
-                    0 -> showAddDialog(contact)
-                    1 -> confirmDelete(contact)
-                }
+                when (which) { 0 -> showAddDialog(contact); 1 -> confirmDelete(contact) }
             }.show()
     }
 
@@ -290,26 +264,13 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Delete") { _, _ ->
                 cancelReminder(contact)
                 contacts.removeAll { it.id == contact.id }
-                saveContacts()
-                updateList()
+                saveContacts(); updateList()
                 Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null).show()
     }
 
-    fun getContact(id: String) = contacts.find { it.id == id }
-
-    fun updateContactWishIndex(id: String, newIdx: Int) {
-        val idx = contacts.indexOfFirst { it.id == id }
-        if (idx >= 0) {
-            contacts[idx] = contacts[idx].copy(wishIndex = newIdx)
-            saveContacts()
-        }
-    }
-
-    private fun scheduleAllReminders() {
-        contacts.forEach { scheduleYearlyReminder(it) }
-    }
+    private fun scheduleAllReminders() { contacts.forEach { scheduleYearlyReminder(it) } }
 
     private fun scheduleYearlyReminder(contact: Contact) {
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -328,8 +289,7 @@ class MainActivity : AppCompatActivity() {
                 set(Calendar.DAY_OF_MONTH, parts[2].toInt())
                 set(Calendar.HOUR_OF_DAY, contact.remindHour)
                 set(Calendar.MINUTE, contact.remindMin)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+                set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
                 if (before(now)) add(Calendar.YEAR, 1)
             }
             am.setRepeating(AlarmManager.RTC_WAKEUP, cal.timeInMillis,
@@ -450,20 +410,18 @@ class MainActivity : AppCompatActivity() {
                 Calendar.getInstance().get(Calendar.YEAR) - c.date.split("-")[0].toInt()
             } catch (e: Exception) { 0 }
 
-            val icon = if (c.cat == "anniversary") "💑" else "🎂"
-            val catLabel = if (c.cat == "anniversary") "Anniversary" else "Birthday"
-            val ageStr = if (years > 0 && c.cat == "birthday") " · Turning $years"
-                else if (years > 0 && c.cat == "anniversary") " · ${years}th year"
-                else ""
-
-            holder.tvIcon.text = icon
+            holder.tvIcon.text = if (c.cat == "anniversary") "💑" else "🎂"
             holder.tvName.text = c.name
+            val catLabel = if (c.cat == "anniversary") "Anniversary" else "Birthday"
             holder.tvOccasion.text = "$catLabel · ⏰ ${fmtTime(c.remindHour, c.remindMin)}"
+            val ageStr = when {
+                years > 0 && c.cat == "birthday" -> " · Turning $years"
+                years > 0 && c.cat == "anniversary" -> " · ${ordinal(years)} year"
+                else -> ""
+            }
             holder.tvDate.text = formatDateDisplay(c.date) + ageStr
             holder.tvDays.text = when (days) {
-                0 -> "🎉 Today!"
-                1 -> "Tomorrow!"
-                else -> "in $days days"
+                0 -> "🎉 Today!"; 1 -> "Tomorrow!"; else -> "in $days days"
             }
             holder.btnCreateWish.setOnClickListener { onWish(c) }
             holder.itemView.setOnLongClickListener { onLongPress(c); true }
@@ -476,6 +434,12 @@ class MainActivity : AppCompatActivity() {
                     "Jul","Aug","Sep","Oct","Nov","Dec")
                 "${months[parts[1].toInt()-1]} ${parts[2].toInt()}, ${parts[0]}"
             } catch (e: Exception) { dateStr }
+        }
+
+        private fun ordinal(n: Int): String {
+            val s = when { n % 100 in 11..13 -> "th"; n % 10 == 1 -> "st"
+                n % 10 == 2 -> "nd"; n % 10 == 3 -> "rd"; else -> "th" }
+            return "$n$s"
         }
     }
 }
