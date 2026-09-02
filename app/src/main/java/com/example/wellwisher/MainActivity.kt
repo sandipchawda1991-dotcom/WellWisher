@@ -1,5 +1,6 @@
 package com.example.wellwisher
 
+import android.Manifest
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,19 +8,30 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.api.services.drive.DriveScopes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -44,11 +56,36 @@ class MainActivity : AppCompatActivity() {
     private val filtered = mutableListOf<Contact>()
     private lateinit var adapter: ContactAdapter
     private var currentFilter = "all"
+    private lateinit var driveBackup: DriveBackupManager
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            Toast.makeText(this, "✅ Notifications enabled! You will be reminded on every birthday and anniversary.", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "⚠️ Notifications disabled. You can enable them in phone Settings → Apps → WellWisher → Notifications", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            task.getResult(Exception::class.java)
+            Toast.makeText(this, "✅ Google account connected!", Toast.LENGTH_SHORT).show()
+            performBackup()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Google sign in failed", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
+        driveBackup = DriveBackupManager(this)
         prefs = getSharedPreferences("wellwisher", Context.MODE_PRIVATE)
 
         val name = prefs.getString("user_name", "") ?: ""
@@ -62,11 +99,130 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(Intent(this, AddOccasionActivity::class.java), 100)
         }
 
-        findViewById<TextView>(R.id.tvGreeting).setOnClickListener { askUserName() }
+        findViewById<TextView>(R.id.tvGreeting).setOnClickListener { showProfileMenu() }
         if (name.isEmpty()) askUserName()
+
+        // Ask notification permission on first launch
+        if (!prefs.getBoolean("notif_asked", false)) {
+            prefs.edit().putBoolean("notif_asked", true).apply()
+            requestNotificationPermission()
+        }
+
+        // Check if Google Drive restore needed
+        checkAndRestore()
 
         updateList()
         scheduleAllReminders()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        == PackageManager.PERMISSION_GRANTED -> {
+                    // Already granted
+                }
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    AlertDialog.Builder(this)
+                        .setTitle("🔔 Enable Notifications")
+                        .setMessage("WellWisher needs notification permission to remind you about birthdays and anniversaries on the right day!\n\nWithout this, you won't get reminders.")
+                        .setPositiveButton("Enable") { _, _ ->
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        .setNegativeButton("Not now", null)
+                        .show()
+                }
+                else -> {
+                    AlertDialog.Builder(this)
+                        .setTitle("🔔 Stay Reminded!")
+                        .setMessage("Allow WellWisher to send you birthday and anniversary reminders so you never miss a special moment!")
+                        .setPositiveButton("Allow") { _, _ ->
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        .setNegativeButton("Skip", null)
+                        .show()
+                }
+            }
+        }
+    }
+
+    private fun showProfileMenu() {
+        val name = prefs.getString("user_name", "") ?: ""
+        val isSignedIn = GoogleSignIn.getLastSignedInAccount(this) != null
+        val items = mutableListOf(
+            "✏️ Change name",
+            if (isSignedIn) "☁️ Backup to Google Drive" else "☁️ Connect Google Drive",
+            if (isSignedIn) "🔄 Restore from Drive" else "🔔 Enable Notifications"
+        )
+        AlertDialog.Builder(this)
+            .setTitle(if (name.isEmpty()) "WellWisher" else "Hi $name!")
+            .setItems(items.toTypedArray()) { _, which ->
+                when (which) {
+                    0 -> askUserName()
+                    1 -> if (isSignedIn) performBackup() else signInToGoogle()
+                    2 -> if (isSignedIn) performRestore() else requestNotificationPermission()
+                }
+            }.show()
+    }
+
+    private fun signInToGoogle() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
+            .build()
+        val client = GoogleSignIn.getClient(this, gso)
+        googleSignInLauncher.launch(client.signInIntent)
+    }
+
+    private fun performBackup() {
+        val data = prefs.getString("contacts", "[]") ?: "[]"
+        Toast.makeText(this, "☁️ Backing up to Google Drive...", Toast.LENGTH_SHORT).show()
+        CoroutineScope(Dispatchers.Main).launch {
+            val success = driveBackup.backupToDrive(data)
+            if (success) {
+                prefs.edit().putLong("last_backup", System.currentTimeMillis()).apply()
+                Toast.makeText(this@MainActivity, "✅ Backup successful! Your data is safe on Google Drive.", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this@MainActivity, "❌ Backup failed. Check your internet connection.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun performRestore() {
+        AlertDialog.Builder(this)
+            .setTitle("🔄 Restore from Drive?")
+            .setMessage("This will replace your current contacts with the backup from Google Drive. Continue?")
+            .setPositiveButton("Restore") { _, _ ->
+                Toast.makeText(this, "🔄 Restoring from Google Drive...", Toast.LENGTH_SHORT).show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    val data = driveBackup.restoreFromDrive()
+                    if (data != null) {
+                        prefs.edit().putString("contacts", data).apply()
+                        loadContacts()
+                        updateList()
+                        setupCalendarStrip()
+                        scheduleAllReminders()
+                        Toast.makeText(this@MainActivity, "✅ Restore successful! ${contacts.size} contacts restored.", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "❌ No backup found or restore failed.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun checkAndRestore() {
+        val lastBackup = prefs.getLong("last_backup", 0)
+        val isSignedIn = GoogleSignIn.getLastSignedInAccount(this) != null
+        if (isSignedIn && contacts.isEmpty() && lastBackup == 0L) {
+            AlertDialog.Builder(this)
+                .setTitle("🔄 Restore your data?")
+                .setMessage("Found a Google account connected. Would you like to restore your WellWisher contacts from Google Drive?")
+                .setPositiveButton("Restore") { _, _ -> performRestore() }
+                .setNegativeButton("Start fresh", null)
+                .show()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -75,6 +231,10 @@ class MainActivity : AppCompatActivity() {
             loadContacts()
             updateList()
             setupCalendarStrip()
+            // Auto backup after adding
+            if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+                performBackup()
+            }
         }
     }
 
@@ -136,15 +296,11 @@ class MainActivity : AppCompatActivity() {
         val currentMonth = cal.get(Calendar.MONTH)
         val currentYear = cal.get(Calendar.YEAR)
 
-        // Show next 30 days
         for (i in 0 until 30) {
             val dayCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, i) }
             val day = dayCal.get(Calendar.DAY_OF_MONTH)
             val month = dayCal.get(Calendar.MONTH)
-            val year = dayCal.get(Calendar.YEAR)
             val isToday = i == 0
-
-            // Check if any contact has event on this day
             val hasEvent = contacts.any {
                 try {
                     val parts = it.date.split("-")
@@ -152,28 +308,21 @@ class MainActivity : AppCompatActivity() {
                 } catch (e: Exception) { false }
             }
 
+            val dp56 = (56 * resources.displayMetrics.density).toInt()
+            val dp4 = (4 * resources.displayMetrics.density).toInt()
+
             val dayView = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
-                val dp = (56 * resources.displayMetrics.density).toInt()
-                val dp4 = (4 * resources.displayMetrics.density).toInt()
-                layoutParams = LinearLayout.LayoutParams(dp, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                layoutParams = LinearLayout.LayoutParams(dp56, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
                     marginEnd = dp4
                 }
-                setPadding(dp4 * 2, dp4 * 2, dp4 * 2, dp4 * 2)
+                setPadding(dp4*2, dp4*2, dp4*2, dp4*2)
                 setBackgroundColor(when {
                     isToday -> 0xFF6B4EFF.toInt()
                     hasEvent -> 0xFFEDE9FF.toInt()
                     else -> Color.TRANSPARENT
                 })
-            }
-
-            val dayNumTv = TextView(this).apply {
-                text = day.toString()
-                textSize = 16f
-                setTextColor(if (isToday) Color.WHITE else 0xFF1A1A2E.toInt())
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-                gravity = Gravity.CENTER
             }
 
             val dayNameTv = TextView(this).apply {
@@ -183,7 +332,13 @@ class MainActivity : AppCompatActivity() {
                 setTextColor(if (isToday) 0xFFC4B5FD.toInt() else 0xFF888899.toInt())
                 gravity = Gravity.CENTER
             }
-
+            val dayNumTv = TextView(this).apply {
+                text = day.toString()
+                textSize = 16f
+                setTextColor(if (isToday) Color.WHITE else 0xFF1A1A2E.toInt())
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                gravity = Gravity.CENTER
+            }
             val dotTv = TextView(this).apply {
                 text = if (hasEvent) "●" else " "
                 textSize = 8f
@@ -197,10 +352,9 @@ class MainActivity : AppCompatActivity() {
             strip.addView(dayView)
         }
 
-        // Update month header
-        val monthYearStr = "${monthNames[currentMonth]} $currentYear"
         val eventCount = contacts.count { daysUntil(it.date) <= 30 }
-        findViewById<TextView>(R.id.tvCalMonth).text = monthYearStr
+        findViewById<TextView>(R.id.tvCalMonth).text =
+            "${monthNames[currentMonth]} $currentYear"
         findViewById<TextView>(R.id.tvEventCount).text = "$eventCount events this month"
     }
 
@@ -296,6 +450,7 @@ class MainActivity : AppCompatActivity() {
                 saveContacts()
                 updateList()
                 setupCalendarStrip()
+                if (GoogleSignIn.getLastSignedInAccount(this) != null) performBackup()
                 Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null).show()
@@ -359,15 +514,6 @@ class MainActivity : AppCompatActivity() {
         val ampm = if (h >= 12) "PM" else "AM"
         val h12 = if (h % 12 == 0) 12 else h % 12
         return "$h12:${m.toString().padStart(2, '0')} $ampm"
-    }
-
-    private fun formatDateDisplay(dateStr: String): String {
-        return try {
-            val parts = dateStr.split("-")
-            val months = listOf("Jan","Feb","Mar","Apr","May","Jun",
-                "Jul","Aug","Sep","Oct","Nov","Dec")
-            "${months[parts[1].toInt()-1]} ${parts[2].toInt()}, ${parts[0]}"
-        } catch (e: Exception) { dateStr }
     }
 
     private fun saveContacts() {
@@ -440,17 +586,16 @@ class MainActivity : AppCompatActivity() {
             val years = try {
                 Calendar.getInstance().get(Calendar.YEAR) - c.date.split("-")[0].toInt()
             } catch (e: Exception) { 0 }
-
             holder.tvIcon.text = if (c.cat == "anniversary") "💑" else "🎂"
             holder.tvName.text = c.name
             val catLabel = if (c.cat == "anniversary") "Anniversary" else "Birthday"
-            holder.tvOccasion.text = "$catLabel · ⏰ ${fmtTime(c.remindHour, c.remindMin)}"
+            holder.tvOccasion.text = "$catLabel · ${fmtTime(c.remindHour, c.remindMin)}"
             val ageStr = when {
                 years > 0 && c.cat == "birthday" -> " · Turning $years"
                 years > 0 && c.cat == "anniversary" -> " · ${ordinal(years)} year"
                 else -> ""
             }
-            holder.tvDate.text = formatDateDisplay(c.date) + ageStr
+            holder.tvDate.text = formatDate(c.date) + ageStr
             holder.tvDays.text = when (days) {
                 0 -> "🎉 Today!"; 1 -> "Tomorrow!"; else -> "in $days days"
             }
@@ -458,7 +603,7 @@ class MainActivity : AppCompatActivity() {
             holder.itemView.setOnLongClickListener { onLongPress(c); true }
         }
 
-        private fun formatDateDisplay(dateStr: String): String {
+        private fun formatDate(dateStr: String): String {
             return try {
                 val parts = dateStr.split("-")
                 val months = listOf("Jan","Feb","Mar","Apr","May","Jun",
