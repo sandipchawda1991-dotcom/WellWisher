@@ -3,30 +3,10 @@
     <string-array name="categories">
         <item>🎂 Birthday</item>
         <item>💑 Anniversary</item>
-        <item>💼 Work Anniversary</item>
-        <item>🎓 Graduation</item>
-        <item>👶 Baby Birthday</item>
-        <item>🤝 Friendship Day</item>
-        <item>✨ Custom</item>
-    </string-array>
-    <string-array name="relationships">
-        <item>🧑 A Friend</item>
-        <item>❤️ Family</item>
-        <item>💼 Colleague</item>
-        <item>👔 Boss</item>
-        <item>💕 Partner</item>
-        <item>👤 Other</item>
-    </string-array>
-    <string-array name="lengths">
-        <item>🥰 Warm</item>
-        <item>😄 Funny</item>
-        <item>🎯 Formal</item>
-        <item>💝 Heartfelt</item>
     </string-array>
     <string-array name="emojis">
-        <item>🚫 None</item>
-        <item>😊 Few</item>
-        <item>🎉🎊 Some</item>
-        <item>🎉🎊🎈 Lots</item>
+        <item>No Emoji</item>
+        <item>Few Emojis</item>
+        <item>Lots of Emojis</item>
     </string-array>
 </resources>
