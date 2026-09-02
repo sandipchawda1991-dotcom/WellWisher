@@ -29,10 +29,5 @@ dependencies {
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0") {
-        exclude(group = "org.apache.httpcomponents")
-    }
-    implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0") {
-        exclude(group = "org.apache.httpcomponents")
-    }
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
