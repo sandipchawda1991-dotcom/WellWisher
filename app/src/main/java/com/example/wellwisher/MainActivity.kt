@@ -10,8 +10,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,9 +62,17 @@ class MainActivity : AppCompatActivity() {
             scheduleAllReminders()
         } else {
             Toast.makeText(this,
-                "Notifications disabled. Go to Settings > Apps > WellWisher > Notifications to enable.",
+                "Please enable notifications in Settings > Apps > WellWisher > Notifications",
                 Toast.LENGTH_LONG).show()
         }
+    }
+
+    private val exactAlarmLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        // After returning from alarm settings
+        scheduleAllReminders()
+        Toast.makeText(this, "Reminders updated!", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,13 +99,61 @@ class MainActivity : AppCompatActivity() {
         // Ask notification permission on first launch
         if (!prefs.getBoolean("notif_asked", false)) {
             prefs.edit().putBoolean("notif_asked", true).apply()
-            requestNotificationPermission()
+            requestAllPermissions()
         } else {
-            checkNotificationPermission()
+            requestAllPermissions()
         }
 
         updateList()
         scheduleAllReminders()
+    }
+
+    private fun requestAllPermissions() {
+        // Step 1: Request notification permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                AlertDialog.Builder(this)
+                    .setTitle("🔔 Enable Notifications")
+                    .setMessage("WellWisher needs notification permission to remind you about birthdays and anniversaries!\n\nPlease tap Allow on the next screen.")
+                    .setPositiveButton("Continue") { _, _ ->
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    .setNegativeButton("Skip", null)
+                    .show()
+                return
+            }
+        }
+
+        // Step 2: Request exact alarm permission
+        requestExactAlarmPermission()
+    }
+
+    private fun requestExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!am.canScheduleExactAlarms()) {
+                AlertDialog.Builder(this)
+                    .setTitle("⏰ Allow Alarms & Reminders")
+                    .setMessage("WellWisher needs permission to set exact alarms so you get notified at the right time on birthdays!\n\nOn the next screen, find WellWisher and turn it ON.")
+                    .setPositiveButton("Open Settings") { _, _ ->
+                        try {
+                            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            exactAlarmLauncher.launch(intent)
+                        } catch (e: Exception) {
+                            // Fallback
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                        }
+                    }
+                    .setNegativeButton("Skip", null)
+                    .show()
+            }
+        }
     }
 
     private fun checkNotificationPermission(): Boolean {
@@ -104,26 +163,14 @@ class MainActivity : AppCompatActivity() {
         } else true
     }
 
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            AlertDialog.Builder(this)
-                .setTitle("🔔 Stay Reminded!")
-                .setMessage("Allow WellWisher to send you birthday and anniversary reminders so you never miss a special moment!")
-                .setPositiveButton("Allow") { _, _ ->
-                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-                .setNegativeButton("Skip", null)
-                .show()
-        }
-    }
-
     private fun showProfileMenu() {
         val name = prefs.getString("user_name", "") ?: ""
         val items = arrayOf(
             "✏️ Change my name",
-            "☁️ Backup data (share as text)",
+            "☁️ Backup data",
             "📥 Restore data",
-            "🔔 Check notification status"
+            "🔔 Notification settings",
+            "🧪 Send test notification"
         )
         AlertDialog.Builder(this)
             .setTitle(if (name.isEmpty()) "WellWisher" else "Hi $name!")
@@ -132,22 +179,90 @@ class MainActivity : AppCompatActivity() {
                     0 -> askUserName()
                     1 -> backupData()
                     2 -> restoreData()
-                    3 -> checkAndShowNotificationStatus()
+                    3 -> showNotificationSettings()
+                    4 -> sendTestNotification()
                 }
             }.show()
+    }
+
+    private fun showNotificationSettings() {
+        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val notifEnabled = checkNotificationPermission()
+        val alarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            am.canScheduleExactAlarms()
+        } else true
+
+        val status = buildString {
+            append("Notifications: ${if (notifEnabled) "✅ Enabled" else "❌ Disabled"}\n\n")
+            append("Alarms & Reminders: ${if (alarmEnabled) "✅ Allowed" else "❌ Not allowed"}\n\n")
+            append("Active reminders: ${contacts.size}\n\n")
+            if (!notifEnabled) append("⚠️ Enable notifications in Settings > Apps > WellWisher > Notifications\n\n")
+            if (!alarmEnabled) append("⚠️ Allow alarms in Settings > Apps > WellWisher > Alarms & Reminders")
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("🔔 Notification Status")
+            .setMessage(status)
+            .setPositiveButton("Fix Settings") { _, _ ->
+                if (!notifEnabled) {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                } else if (!alarmEnabled) {
+                    requestExactAlarmPermission()
+                }
+            }
+            .setNegativeButton("OK", null)
+            .show()
+    }
+
+    private fun sendTestNotification() {
+        if (!checkNotificationPermission()) {
+            requestAllPermissions()
+            return
+        }
+
+        val firstContact = contacts.firstOrNull()
+        val wishIntent = Intent(this, WishActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("contact_id", firstContact?.id ?: "")
+        }
+        val pi = PendingIntent.getActivity(
+            this, 99999, wishIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(this, "wellwisher")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("🎂 Birthday Today — Test!")
+            .setContentText("Notifications are working! Tap to open WellWisher.")
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("Great news! Your WellWisher notifications are working correctly. You will be reminded on every birthday and anniversary at the time you set!"))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setContentIntent(pi)
+            .build()
+
+        nm.notify(99998, notification)
+        Toast.makeText(this,
+            "Test notification sent! Pull down your notification bar to see it.",
+            Toast.LENGTH_LONG).show()
     }
 
     private fun backupData() {
         val data = prefs.getString("contacts", "[]") ?: "[]"
         val count = contacts.size
-        // Share as text so user can save anywhere
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, "WellWisher Backup")
             putExtra(Intent.EXTRA_TEXT, "WELLWISHER_BACKUP:$data")
         }
         startActivity(Intent.createChooser(intent,
-            "Save backup ($count contacts) — save to Notes, Drive, Email etc."))
+            "Save backup ($count contacts)"))
     }
 
     private fun restoreData() {
@@ -167,7 +282,7 @@ class MainActivity : AppCompatActivity() {
                 if (text.startsWith("WELLWISHER_BACKUP:")) {
                     val data = text.removePrefix("WELLWISHER_BACKUP:")
                     try {
-                        JSONArray(data) // validate
+                        JSONArray(data)
                         prefs.edit().putString("contacts", data).apply()
                         loadContacts()
                         updateList()
@@ -178,44 +293,16 @@ class MainActivity : AppCompatActivity() {
                             Toast.LENGTH_LONG).show()
                     } catch (e: Exception) {
                         Toast.makeText(this,
-                            "Invalid backup data. Please check and try again.",
+                            "Invalid backup data. Please try again.",
                             Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(this,
-                        "Invalid backup format. Make sure you copied the full backup text.",
+                        "Invalid format. Copy the full backup text.",
                         Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun checkAndShowNotificationStatus() {
-        val enabled = checkNotificationPermission()
-        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val canScheduleExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            am.canScheduleExactAlarms()
-        } else true
-
-        val status = buildString {
-            append("Notifications: ${if (enabled) "✅ Enabled" else "❌ Disabled"}\n\n")
-            append("Exact Alarms: ${if (canScheduleExact) "✅ Allowed" else "❌ Not allowed"}\n\n")
-            append("Reminders set: ${contacts.size}\n\n")
-            if (!enabled) append("Go to Settings > Apps > WellWisher > Notifications to enable.\n\n")
-            if (!canScheduleExact) append("Go to Settings > Apps > WellWisher > Alarms & Reminders to allow.")
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle("🔔 Notification Status")
-            .setMessage(status)
-            .setPositiveButton("Open Settings") { _, _ ->
-                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = android.net.Uri.parse("package:$packageName")
-                }
-                startActivity(intent)
-            }
-            .setNegativeButton("OK", null)
             .show()
     }
 
@@ -233,6 +320,7 @@ class MainActivity : AppCompatActivity() {
         loadContacts()
         updateList()
         setupCalendarStrip()
+        scheduleAllReminders()
     }
 
     private fun setupAdapter() {
@@ -443,6 +531,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun scheduleAllReminders() {
+        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val canSchedule = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            am.canScheduleExactAlarms()
+        } else true
+
+        if (!canSchedule) return
+
         val receiver = BirthdayReceiver()
         contacts.forEach { c ->
             receiver.scheduleAlarm(
