@@ -7,10 +7,12 @@
     android:padding="14dp"
     android:layout_marginBottom="8dp"
     android:layout_marginHorizontal="8dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
+
         <TextView
             android:id="@+id/tvAvatar"
             android:layout_width="46dp"
@@ -21,11 +23,13 @@
             android:textColor="#4f46e5"
             android:background="#ede9fe"
             android:layout_marginEnd="12dp"/>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
+
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
@@ -33,12 +37,14 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="#1a1a1a"/>
+
             <TextView
                 android:id="@+id/tvMeta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textColor="#6b7280"/>
+
             <TextView
                 android:id="@+id/tvDays"
                 android:layout_width="wrap_content"
@@ -46,13 +52,29 @@
                 android:textSize="12sp"
                 android:textColor="#4f46e5"/>
         </LinearLayout>
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_delete"
-            android:background="#fff1f2"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnEdit"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:background="#e0e7ff"
+                android:layout_marginEnd="4dp"/>
+
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:background="#fff1f2"/>
+        </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:id="@+id/tvWish"
         android:layout_width="match_parent"
@@ -61,11 +83,13 @@
         android:textColor="#4b5563"
         android:textStyle="italic"
         android:layout_marginTop="10dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="10dp">
+
         <Button
             android:id="@+id/btnWhatsApp"
             android:layout_width="0dp"
@@ -76,6 +100,7 @@
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             android:layout_marginEnd="4dp"/>
+
         <Button
             android:id="@+id/btnShare"
             android:layout_width="0dp"
@@ -86,6 +111,7 @@
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             android:layout_marginEnd="4dp"/>
+
         <Button
             android:id="@+id/btnCopy"
             android:layout_width="0dp"
@@ -96,6 +122,7 @@
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             android:layout_marginEnd="4dp"/>
+
         <Button
             android:id="@+id/btnRefresh"
             android:layout_width="0dp"
@@ -105,5 +132,6 @@
             android:backgroundTint="#f0f0f5"
             android:textColor="#4f46e5"
             android:textSize="11sp"/>
+
     </LinearLayout>
 </LinearLayout>
