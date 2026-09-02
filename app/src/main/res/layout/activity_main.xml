@@ -1,120 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="#F2F0FF">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!-- Header -->
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:gravity="center_vertical">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            android:gravity="center_vertical">
-
-            <LinearLayout
-                android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvGreeting"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvGreeting"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hi there 👋"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A2E"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Send a greeting. Spread the joy."
-                    android:textSize="13sp"
-                    android:textColor="#888899"/>
-            </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/btnSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@android:drawable/ic_menu_preferences"
-                android:background="#FFFFFF"
-                android:padding="10dp"/>
-        </LinearLayout>
-
-        <!-- Search bar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="16dp"
-            android:gravity="center_vertical">
-
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:hint="🔍  Search occasions"
-                android:background="#FFFFFF"
-                android:paddingHorizontal="16dp"
-                android:textSize="14sp"
+                android:text="Hi there 👋"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 android:textColor="#1A1A2E"
-                android:textColorHint="#AAAACC"
-                android:singleLine="true"
-                android:imeOptions="actionSearch"/>
+                android:clickable="true"
+                android:focusable="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send a greeting. Spread the joy."
+                android:textSize="13sp"
+                android:textColor="#888899"/>
         </LinearLayout>
+    </LinearLayout>
 
-        <!-- Today section header -->
-        <TextView
-            android:id="@+id/tvSectionTitle"
+    <!-- Filter buttons -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="12dp">
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upcoming Occasions 📅"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#6B4EFF"
-            android:paddingHorizontal="20dp"
-            android:paddingBottom="12dp"/>
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="All"
+                android:textSize="13sp"
+                android:backgroundTint="#6B4EFF"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+            <Button
+                android:id="@+id/btnFilterWeek"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="This Week"
+                android:textSize="13sp"
+                android:backgroundTint="#EDE9FF"
+                android:textColor="#6B4EFF"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+            <Button
+                android:id="@+id/btnFilterMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="This Month"
+                android:textSize="13sp"
+                android:backgroundTint="#EDE9FF"
+                android:textColor="#6B4EFF"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+            <Button
+                android:id="@+id/btnFilterBirthday"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="🎂 Birthdays"
+                android:textSize="13sp"
+                android:backgroundTint="#EDE9FF"
+                android:textColor="#6B4EFF"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+            <Button
+                android:id="@+id/btnFilterAnniversary"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="💑 Anniversaries"
+                android:textSize="13sp"
+                android:backgroundTint="#EDE9FF"
+                android:textColor="#6B4EFF"
+                style="@style/Widget.MaterialComponents.Button"/>
+        </LinearLayout>
+    </HorizontalScrollView>
 
-        <!-- List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+    <!-- Calendar strip -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#FFFFFF">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="80dp"
-            android:clipToPadding="false"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:id="@+id/tvCalMonth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A2E"/>
+                <TextView
+                    android:id="@+id/tvEventCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#6B4EFF"/>
+            </LinearLayout>
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:id="@+id/calendarStrip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"/>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-    </LinearLayout>
+    <!-- Section title -->
+    <TextView
+        android:id="@+id/tvSectionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upcoming Occasions 📅"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#6B4EFF"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="8dp"/>
+
+    <!-- List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"/>
 
     <!-- Empty state -->
     <LinearLayout
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="40dp"
         android:visibility="gone">
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🎊"
-            android:textSize="80sp"
-            android:layout_marginBottom="24dp"/>
-
+            android:textSize="72sp"
+            android:layout_marginBottom="20dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -123,19 +194,18 @@
             android:textStyle="bold"
             android:textColor="#1A1A2E"
             android:gravity="center"
-            android:layout_marginBottom="12dp"/>
-
+            android:layout_marginBottom="10dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add birthdays, anniversaries, and more so you never miss a special moment."
+            android:text="Add birthdays and anniversaries so you never miss a special moment."
             android:textSize="14sp"
             android:textColor="#888899"
             android:gravity="center"
-            android:lineSpacingMultiplier="1.4"/>
+            android:lineSpacingMultiplier="1.5"/>
     </LinearLayout>
 
-    <!-- FAB -->
+    <!-- Bottom Add button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"
@@ -147,4 +217,4 @@
         app:tint="@android:color/white"
         app:fabSize="normal"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
