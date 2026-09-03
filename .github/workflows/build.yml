@@ -1,4 +1,4 @@
-name: Build Signed APK
+name: Build APK
 on:
   push:
     branches: [ main ]
@@ -20,24 +20,11 @@ jobs:
           unzip -q gradle-8.9-bin.zip
           echo "$(pwd)/gradle-8.9/bin" >> $GITHUB_PATH
 
-      - name: Decode Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" > keystore_encoded.txt
-          base64 -d keystore_encoded.txt > app/wellwisher.jks
-          echo "Keystore decoded successfully"
-          ls -la app/wellwisher.jks
+      - name: Build Debug APK
+        run: gradle assembleDebug --no-daemon
 
-      - name: Build Signed Release APK
-        run: |
-          gradle assembleRelease \
-            -Pandroid.injected.signing.store.file=$(pwd)/app/wellwisher.jks \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }} \
-            --no-daemon
-
-      - name: Upload Signed APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: WellWisher-Signed-APK
-          path: app/build/outputs/apk/release/app-release.apk
+          name: WellWisher-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
