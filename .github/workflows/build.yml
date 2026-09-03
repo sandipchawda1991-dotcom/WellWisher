@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Signed APK
 on:
   push:
     branches: [ main ]
@@ -22,9 +22,12 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/wellwisher.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" > keystore_encoded.txt
+          base64 -d keystore_encoded.txt > app/wellwisher.jks
+          echo "Keystore decoded successfully"
+          ls -la app/wellwisher.jks
 
-      - name: Build Signed APK
+      - name: Build Signed Release APK
         run: |
           gradle assembleRelease \
             -Pandroid.injected.signing.store.file=$(pwd)/app/wellwisher.jks \
